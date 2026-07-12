@@ -1,0 +1,3 @@
+include AGENTS.md
+include docs/*.rst
+include docs/conf.py
