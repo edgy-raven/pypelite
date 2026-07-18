@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Pypelite API Reference &#8212; pypelite 0.1.12 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=27fed22d" />
+    <script src="_static/documentation_options.js?v=297ad043"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="pypelite-api-reference">
+<h1>Pypelite API Reference<a class="headerlink" href="#pypelite-api-reference" title="Link to this heading">¶</a></h1>
+<p>Pypelite builds expressive pipelines from ordinary Python without requiring a
+DAG or orchestration platform. See the <a class="reference external" href="https://github.com/edgy-raven/pypelite">project README</a> for the guide and examples.</p>
+<section id="module-pypelite">
+<span id="pipeline"></span><h2>Pipeline<a class="headerlink" href="#module-pypelite" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pypelite.pipeline">
+<span class="sig-prename descclassname"><span class="pre">pypelite.</span></span><span class="sig-name descname"><span class="pre">pipeline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="positional-only-separator o"><abbr title="Positional-only parameter separator (PEP 570)"><span class="pre">/</span></abbr></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">archive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">archives</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refresh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clean</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">until</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">read_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pypelite.pipeline" title="Link to this definition">¶</a></dt>
+<dd><p>Run checkpoints and cached stages against an archive.</p>
+<p>The context does not plan a DAG. Your Python code decides which stages run.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> – Default archive directory. Pass it positionally. Ignored when
+<code class="docutils literal notranslate"><span class="pre">archive</span></code> is supplied.</p></li>
+<li><p><strong>archive</strong> – Preconfigured default <a class="reference internal" href="#pypelite.Archive" title="pypelite.Archive"><code class="xref py py-class docutils literal notranslate"><span class="pre">Archive</span></code></a>, including custom formatters.</p></li>
+<li><p><strong>archives</strong> – Additional named archives for cached functions that set
+<code class="docutils literal notranslate"><span class="pre">archive=...</span></code>. Values may be paths or <a class="reference internal" href="#pypelite.Archive" title="pypelite.Archive"><code class="xref py py-class docutils literal notranslate"><span class="pre">Archive</span></code></a> instances.
+This mapping cannot contain <code class="docutils literal notranslate"><span class="pre">&quot;default&quot;</span></code>. Formatter resolution uses
+the named archive, the default archive, then pickle.</p></li>
+<li><p><strong>refresh</strong> – List or tuple of cached-function names to rerun and write back. Use
+<code class="docutils literal notranslate"><span class="pre">&quot;all&quot;</span></code> for every available function.</p></li>
+<li><p><strong>clean</strong> – List or tuple of names to prune after a completed run. Untouched
+artifacts are removed. Use <code class="docutils literal notranslate"><span class="pre">&quot;all&quot;</span></code> for every available function.</p></li>
+<li><p><strong>skip</strong> – List or tuple of names whose calls return their decorator
+<code class="docutils literal notranslate"><span class="pre">skip_value</span></code> without cache access or execution.</p></li>
+<li><p><strong>until</strong> – Cached-function name after which the context exits normally.</p></li>
+<li><p><strong>read_only</strong> – Use shared archive locks and reject cache misses. Cannot be combined
+with <code class="docutils literal notranslate"><span class="pre">refresh</span></code> or <code class="docutils literal notranslate"><span class="pre">clean</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pypelite.argument_parser">
+<span class="sig-prename descclassname"><span class="pre">pypelite.</span></span><span class="sig-name descname"><span class="pre">argument_parser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pypelite.argument_parser" title="Link to this definition">¶</a></dt>
+<dd><p>Create a parser for <a class="reference internal" href="#pypelite.pipeline" title="pypelite.pipeline"><code class="xref py py-func docutils literal notranslate"><span class="pre">pipeline()</span></code></a> run controls.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>**kwargs</strong> – Passed to <code class="xref py py-class docutils literal notranslate"><span class="pre">argparse.ArgumentParser</span></code>.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Parser providing <code class="docutils literal notranslate"><span class="pre">--refresh</span></code>, <code class="docutils literal notranslate"><span class="pre">--clean</span></code>, <code class="docutils literal notranslate"><span class="pre">--skip</span></code>, <code class="docutils literal notranslate"><span class="pre">--until</span></code>,
+and <code class="docutils literal notranslate"><span class="pre">--read-only</span></code>. Stage-name choices come from registered cached
+functions.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>argparse.ArgumentParser</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pypelite.checkpoint">
+<span class="sig-prename descclassname"><span class="pre">pypelite.</span></span><span class="sig-name descname"><span class="pre">checkpoint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">archive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'default'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reject_changed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">executor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pypelite.checkpoint" title="Link to this definition">¶</a></dt>
+<dd><p>Save one result for a pipeline checkpoint.</p>
+<p>Call arguments are recorded but do not select separate artifacts.
+<code class="docutils literal notranslate"><span class="pre">batch</span></code> computes one final result in worker-backed batches.
+Cache hits reject changed arguments unless <code class="docutils literal notranslate"><span class="pre">reject_changed=False</span></code>.
+Explicit <code class="docutils literal notranslate"><span class="pre">batch_size</span></code> and <code class="docutils literal notranslate"><span class="pre">workers</span></code> values must be positive integers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – Archive directory and run-control name. Defaults to the decorated
+function name.</p></li>
+<li><p><strong>archive</strong> – Name of the archive supplied to <a class="reference internal" href="#pypelite.pipeline" title="pypelite.pipeline"><code class="xref py py-func docutils literal notranslate"><span class="pre">pipeline()</span></code></a>. Defaults to
+<code class="docutils literal notranslate"><span class="pre">&quot;default&quot;</span></code>.</p></li>
+<li><p><strong>source</strong> – Include source code in artifact identity. Source changes then create
+a new checkpoint artifact.</p></li>
+<li><p><strong>reject_changed</strong> – Reject a cache hit when any call argument differs. Defaults to
+<code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+<li><p><strong>batch</strong> – Name of the collection parameter passed to worker batches. Omit to
+call the function once normally.</p></li>
+<li><p><strong>batch_size</strong> – Maximum items per worker batch. <code class="docutils literal notranslate"><span class="pre">None</span></code> chooses sizes automatically.</p></li>
+<li><p><strong>skip_value</strong> – Value returned when this checkpoint is selected by <code class="docutils literal notranslate"><span class="pre">pipeline(skip=)</span></code>.</p></li>
+<li><p><strong>workers</strong> – Number of workers. <code class="docutils literal notranslate"><span class="pre">None</span></code> uses one worker.</p></li>
+<li><p><strong>executor</strong> – <code class="docutils literal notranslate"><span class="pre">&quot;thread&quot;</span></code> (the default) or <code class="docutils literal notranslate"><span class="pre">&quot;process&quot;</span></code>. Used only with
+<code class="docutils literal notranslate"><span class="pre">batch</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pypelite.stage">
+<span class="sig-prename descclassname"><span class="pre">pypelite.</span></span><span class="sig-name descname"><span class="pre">stage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">archive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'default'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reject_changed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vectorize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">executor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pypelite.stage" title="Link to this definition">¶</a></dt>
+<dd><p>Cache function results as a pipeline stage.</p>
+<p>All arguments form the key by default. Set <code class="docutils literal notranslate"><span class="pre">key</span></code> to a name, tuple, or
+callable to select the cache identity. <code class="docutils literal notranslate"><span class="pre">vectorize</span></code> adapts a scalar
+function to collections; <code class="docutils literal notranslate"><span class="pre">batch</span></code> passes collections to the function.
+Cache hits reject changed non-key arguments unless
+<code class="docutils literal notranslate"><span class="pre">reject_changed=False</span></code>.
+Explicit <code class="docutils literal notranslate"><span class="pre">batch_size</span></code> and <code class="docutils literal notranslate"><span class="pre">workers</span></code> values must be positive integers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – Archive directory and run-control name. Defaults to the decorated
+function name.</p></li>
+<li><p><strong>archive</strong> – Name of the archive supplied to <a class="reference internal" href="#pypelite.pipeline" title="pypelite.pipeline"><code class="xref py py-func docutils literal notranslate"><span class="pre">pipeline()</span></code></a>. Defaults to
+<code class="docutils literal notranslate"><span class="pre">&quot;default&quot;</span></code>.</p></li>
+<li><p><strong>key</strong> – Artifact identity selector. <code class="docutils literal notranslate"><span class="pre">True</span></code> uses all arguments; a string or
+tuple selects fields; a callable returns a derived key.</p></li>
+<li><p><strong>source</strong> – Include source code in artifact identity. Source changes then create
+new artifacts.</p></li>
+<li><p><strong>reject_changed</strong> – Reject a cache hit when any non-key argument differs from the call
+that produced it. Defaults to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+<li><p><strong>vectorize</strong> – Name of a scalar parameter. Callers pass a collection and pypelite
+calls the function once per missing item.</p></li>
+<li><p><strong>batch</strong> – Name of a collection parameter. Pypelite passes missing items to the
+function in batches. Mutually exclusive with <code class="docutils literal notranslate"><span class="pre">vectorize</span></code>.</p></li>
+<li><p><strong>batch_size</strong> – Maximum items per worker batch. <code class="docutils literal notranslate"><span class="pre">None</span></code> chooses sizes automatically.</p></li>
+<li><p><strong>skip_value</strong> – Value returned when this stage is selected by <code class="docutils literal notranslate"><span class="pre">pipeline(skip=)</span></code>.</p></li>
+<li><p><strong>workers</strong> – Number of workers. <code class="docutils literal notranslate"><span class="pre">None</span></code> uses one worker.</p></li>
+<li><p><strong>executor</strong> – <code class="docutils literal notranslate"><span class="pre">&quot;thread&quot;</span></code> (the default) or <code class="docutils literal notranslate"><span class="pre">&quot;process&quot;</span></code>. Used with <code class="docutils literal notranslate"><span class="pre">vectorize</span></code>
+or <code class="docutils literal notranslate"><span class="pre">batch</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="errors">
+<h2>Errors<a class="headerlink" href="#errors" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pypelite.PypeliteError">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pypelite.</span></span><span class="sig-name descname"><span class="pre">PypeliteError</span></span><a class="headerlink" href="#pypelite.PypeliteError" title="Link to this definition">¶</a></dt>
+<dd><p>Base class for pypelite contract errors.</p>
+</dd></dl>
+
+</section>
+<section id="archives">
+<h2>Archives<a class="headerlink" href="#archives" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pypelite.Archive">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pypelite.</span></span><span class="sig-name descname"><span class="pre">Archive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formatters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pypelite.Archive" title="Link to this definition">¶</a></dt>
+<dd><p>Archive root plus optional formatters.</p>
+<p>Formatters are tried in order. During a pipeline, additional archives
+inherit the default archive’s formatters and every archive falls back to
+pickle.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> – Directory containing cached-function subdirectories. It is created
+immediately.</p></li>
+<li><p><strong>formatters</strong> – Ordered iterable of <a class="reference internal" href="#pypelite.ArchiveFormat" title="pypelite.ArchiveFormat"><code class="xref py py-class docutils literal notranslate"><span class="pre">ArchiveFormat</span></code></a> instances. The first
+formatter whose <code class="docutils literal notranslate"><span class="pre">value_type</span></code> matches a value is used.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pypelite.ArchiveFormat">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pypelite.</span></span><span class="sig-name descname"><span class="pre">ArchiveFormat</span></span><a class="headerlink" href="#pypelite.ArchiveFormat" title="Link to this definition">¶</a></dt>
+<dd><p>Base class for custom artifact formats.</p>
+<p>Subclass this when a value should not be pickled. Set <code class="docutils literal notranslate"><span class="pre">value_type</span></code> to the
+type the formatter handles, choose a short <code class="docutils literal notranslate"><span class="pre">name</span></code>, and keep that name
+stable after writing artifacts.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pypelite.ArchiveFormat.load">
+<span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pypelite.ArchiveFormat.load" title="Link to this definition">¶</a></dt>
+<dd><p>Read an artifact.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>path</strong> – Artifact path using this formatter’s <code class="docutils literal notranslate"><span class="pre">suffix</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypelite.ArchiveFormat.dump">
+<span class="sig-name descname"><span class="pre">dump</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pypelite.ArchiveFormat.dump" title="Link to this definition">¶</a></dt>
+<dd><p>Write an artifact.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> – Destination path. Pypelite supplies a temporary path and commits
+it transactionally after this method returns.</p></li>
+<li><p><strong>value</strong> – Python value handled by this formatter’s <code class="docutils literal notranslate"><span class="pre">value_type</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypelite.ArchiveFormat.hash">
+<span class="sig-name descname"><span class="pre">hash</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pypelite.ArchiveFormat.hash" title="Link to this definition">¶</a></dt>
+<dd><p>Hash a value using this format.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>value</strong> – Value whose serialized content selects cache identity.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Lowercase SHA-256 digest. Dictionaries and sets are
+order-independent.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pypelite.ArchiveFormat.concat">
+<span class="sig-name descname"><span class="pre">concat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pypelite.ArchiveFormat.concat" title="Link to this definition">¶</a></dt>
+<dd><p>Join outputs from <code class="docutils literal notranslate"><span class="pre">batch</span></code> workers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>values</strong> – Worker results in submission order.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Combined checkpoint result. The pickle implementation flattens
+one collection level.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>object</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function" id="module-pypelite.configs">
+<dt class="sig sig-object py" id="pypelite.configs.archive">
+<span class="sig-prename descclassname"><span class="pre">pypelite.configs.</span></span><span class="sig-name descname"><span class="pre">archive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formatters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defaults</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pypelite.configs.archive" title="Link to this definition">¶</a></dt>
+<dd><p>Create an archive with optional formatters.</p>
+<p>Explicit formatters replace defaults for the same value type.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> – Archive directory.</p></li>
+<li><p><strong>formatters</strong> – Explicit formatter instances. A formatter replaces an installed
+default with the same <code class="docutils literal notranslate"><span class="pre">value_type</span></code>.</p></li>
+<li><p><strong>defaults</strong> – Include compatible optional formatters for installed packages.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Configured archive. Pipeline-level pickle fallback is added later.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#pypelite.Archive" title="pypelite.Archive">pypelite.Archive</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="optional-formats">
+<h2>Optional Formats<a class="headerlink" href="#optional-formats" title="Link to this heading">¶</a></h2>
+<p>The default archive configuration uses compatible formats from installed
+optional packages.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="pypelite.configs.default_formatters">
+<span class="sig-prename descclassname"><span class="pre">pypelite.configs.</span></span><span class="sig-name descname"><span class="pre">default_formatters</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pypelite.configs.default_formatters" title="Link to this definition">¶</a></dt>
+<dd><p>Return formatters for installed optional packages.</p>
+<p>Missing packages are skipped.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Available pandas, NumPy, and XGBoost formatters in lookup order.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list[<a class="reference internal" href="#pypelite.ArchiveFormat" title="pypelite.ArchiveFormat">pypelite.ArchiveFormat</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pypelite.configs.pandas_arrow">
+<span class="sig-prename descclassname"><span class="pre">pypelite.configs.</span></span><span class="sig-name descname"><span class="pre">pandas_arrow</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pypelite.configs.pandas_arrow" title="Link to this definition">¶</a></dt>
+<dd><p>Use Feather for DataFrames.</p>
+<p>This is the default pandas choice.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Feather formatter for <code class="docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code> values.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#pypelite.ArchiveFormat" title="pypelite.ArchiveFormat">pypelite.ArchiveFormat</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pypelite.configs.pandas_csv">
+<span class="sig-prename descclassname"><span class="pre">pypelite.configs.</span></span><span class="sig-name descname"><span class="pre">pandas_csv</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pypelite.configs.pandas_csv" title="Link to this definition">¶</a></dt>
+<dd><p>Use CSV for DataFrames.</p>
+<p>CSV is mainly useful when cached tables need to be opened with text tools.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>CSV formatter for <code class="docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code> values.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#pypelite.ArchiveFormat" title="pypelite.ArchiveFormat">pypelite.ArchiveFormat</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pypelite.configs.numpy_npz">
+<span class="sig-prename descclassname"><span class="pre">pypelite.configs.</span></span><span class="sig-name descname"><span class="pre">numpy_npz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">compressed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pypelite.configs.numpy_npz" title="Link to this definition">¶</a></dt>
+<dd><p>Use NPZ for NumPy arrays.</p>
+<p>Turn compression off when speed matters more than archive size.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>compressed</strong> – Use <code class="docutils literal notranslate"><span class="pre">numpy.savez_compressed</span></code> instead of <code class="docutils literal notranslate"><span class="pre">numpy.savez</span></code>.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Formatter for <code class="docutils literal notranslate"><span class="pre">numpy.ndarray</span></code> values.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#pypelite.ArchiveFormat" title="pypelite.ArchiveFormat">pypelite.ArchiveFormat</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pypelite.configs.xgboost_ubj">
+<span class="sig-prename descclassname"><span class="pre">pypelite.configs.</span></span><span class="sig-name descname"><span class="pre">xgboost_ubj</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pypelite.configs.xgboost_ubj" title="Link to this definition">¶</a></dt>
+<dd><p>Use XGBoost’s UBJ model format for boosters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>UBJ formatter for <code class="docutils literal notranslate"><span class="pre">xgboost.Booster</span></code> values.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#pypelite.ArchiveFormat" title="pypelite.ArchiveFormat">pypelite.ArchiveFormat</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pypelite.configs.keras_weights">
+<span class="sig-prename descclassname"><span class="pre">pypelite.configs.</span></span><span class="sig-name descname"><span class="pre">keras_weights</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_factory</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pypelite.configs.keras_weights" title="Link to this definition">¶</a></dt>
+<dd><p>Use Keras weights files for a concrete model type.</p>
+<p><code class="docutils literal notranslate"><span class="pre">model_factory</span></code> should rebuild the model before weights are loaded.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model_type</strong> – Concrete model class handled by the formatter.</p></li>
+<li><p><strong>model_factory</strong> – Zero-argument callable returning the initialized model structure used
+when loading weights.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>HDF5 weights formatter for <code class="docutils literal notranslate"><span class="pre">model_type</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#pypelite.ArchiveFormat" title="pypelite.ArchiveFormat">pypelite.ArchiveFormat</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="#">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Pypelite API Reference</a><ul>
+<li><a class="reference internal" href="#module-pypelite">Pipeline</a></li>
+<li><a class="reference internal" href="#errors">Errors</a></li>
+<li><a class="reference internal" href="#archives">Archives</a></li>
+<li><a class="reference internal" href="#optional-formats">Optional Formats</a></li>
+</ul>
+</li>
+</ul>
+
+  </div><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 9.1.0</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="_sources/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
